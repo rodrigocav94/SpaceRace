@@ -13,6 +13,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var isPlayerRerouting = false
     var amountOfEnemies = 0
     var enemyCreationDelay: Double = 1
+    var gameOver: SKSpriteNode?
     
     var scoreLabel: SKLabelNode!
     var score = 0 {
@@ -22,7 +23,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     let possibleEnemies = ["chair", "tv", "hammer", "ball", "shoe", "octopus", "astronaut", "tower", "redeemer", "samba", "witch"]
-    var isGameOver = false
+    var isGameOver = false {
+        didSet {
+            if isGameOver {
+                displayGameOver()
+            } else {
+                hideGameOver()
+            }
+        }
+    }
     var gameTimer: Timer?
     
     override func didMove(to view: SKView) {
@@ -84,6 +93,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         var location = touch.location(in: self)
         clampLocation(location: &location)
         if isGameOver {
+            isGameOver = false
             startGame(at: location)
             return
         }
@@ -135,8 +145,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func startGame(at location: CGPoint) {
-        isGameOver = false
-        
         player = SKSpriteNode(imageNamed: "rocket")
         player.position = location
         player.physicsBody = SKPhysicsBody(texture: player.texture!, size: player.size) // Create a physics body based on the texture and size.
@@ -147,5 +155,22 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         enemyCreationDelay = 1
         startTimer()
+    }
+    
+    func displayGameOver() {
+        if isGameOver {
+            if gameOver == nil {
+                gameOver = SKSpriteNode(imageNamed: "gameOver")
+                gameOver?.position = CGPoint(x: 590, y: 410)
+                gameOver?.zPosition = 1
+                addChild(gameOver!)
+            } else if gameOver?.parent == nil  {
+                addChild(gameOver!)
+            }
+        }
+    }
+    
+    func hideGameOver() {
+        gameOver?.removeFromParent()
     }
 }
