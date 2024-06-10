@@ -52,10 +52,30 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
 
     override func update(_ currentTime: TimeInterval) {
-        // Called before each frame is rendered
+        for node in children {
+            if node.position.x < -300 {
+                node.removeFromParent()
+            }
+        }
+        
+        if !isGameOver {
+            score += 1
+        }
     }
     
     @objc func createEnemy() {
+        guard let enemy = possibleEnemies.randomElement() else { return }
         
+        let sprite = SKSpriteNode(imageNamed: enemy)
+        sprite.position = CGPoint(x: 1200, y: Int.random(in: 50...784))
+        addChild(sprite)
+        
+        sprite.physicsBody = SKPhysicsBody(texture: sprite.texture!, size: sprite.size)
+        sprite.physicsBody?.categoryBitMask = 1 // Collision tag.
+        
+        sprite.physicsBody?.velocity = CGVector(dx: -500, dy: 0) // Velocity going from right to left.
+        sprite.physicsBody?.angularVelocity = 5 // Rotation/Spinning Velocity.
+        sprite.physicsBody?.linearDamping = 0 // Movement will not slow down over time.
+        sprite.physicsBody?.angularDamping = 0 // Rotation will not slow down over time.
     }
 }
