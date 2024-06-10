@@ -11,6 +11,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var starfield: SKEmitterNode!
     var player: SKSpriteNode!
     var isPlayerRerouting = false
+    var amountOfEnemies = 0
+    var enemyCreationDelay: Double = 1
     
     var scoreLabel: SKLabelNode!
     var score = 0 {
@@ -48,7 +50,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         physicsWorld.gravity = CGVector(dx: 0, dy: 0)
         physicsWorld.contactDelegate = self
         
-        gameTimer = Timer.scheduledTimer(timeInterval: 0.8, target: self, selector: #selector(createEnemy), userInfo: nil, repeats: true)
+        startTimer()
         
     }
     
@@ -79,6 +81,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         sprite.physicsBody?.angularVelocity = 5 // Rotation/Spinning Velocity.
         sprite.physicsBody?.linearDamping = 0 // Movement will not slow down over time.
         sprite.physicsBody?.angularDamping = 0 // Rotation will not slow down over time.
+        
+        amountOfEnemies += 1
+        if amountOfEnemies % 20 == 0 {
+            enemyCreationDelay -= 0.1
+            startTimer()
+        }
     }
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else { return }
@@ -125,5 +133,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         } else if location.y > 720 {
             location.y = 720
         }
+    }
+    
+    func startTimer() {
+        gameTimer?.invalidate()
+        gameTimer = Timer.scheduledTimer(timeInterval: enemyCreationDelay, target: self, selector: #selector(createEnemy), userInfo: nil, repeats: true)
     }
 }
