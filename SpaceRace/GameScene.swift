@@ -10,6 +10,7 @@ import SpriteKit
 class GameScene: SKScene, SKPhysicsContactDelegate {
     var starfield: SKEmitterNode!
     var player: SKSpriteNode!
+    var isPlayerRerouting = false
     
     var scoreLabel: SKLabelNode!
     var score = 0 {
@@ -79,18 +80,26 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         sprite.physicsBody?.linearDamping = 0 // Movement will not slow down over time.
         sprite.physicsBody?.angularDamping = 0 // Rotation will not slow down over time.
     }
-    
-    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else { return }
         var location = touch.location(in: self)
         
-        // Clamping vertical position
-        if location.y < 100 {
-            location.y = 100
-        } else if location.y > 720 {
-            location.y = 720
-        }
+        clampLocation(location: &location)
         
+        isPlayerRerouting = true
+        let moveToLocation = SKAction.move(to: location, duration: 0.3)
+        let reactivateMovement = SKAction.run { [unowned self] in
+            isPlayerRerouting = false
+        }
+        player.run(SKAction.sequence([moveToLocation, reactivateMovement]))
+    }
+    
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let touch = touches.first else { return }
+        if isPlayerRerouting { return }
+        var location = touch.location(in: self)
+        
+        clampLocation(location: &location)
         player.position = location
     }
     
@@ -107,5 +116,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         explosion.run(SKAction.sequence([delay, removeExplosionNode]))
         
         isGameOver = true
+    }
+    
+    func clampLocation(location: inout CGPoint) {
+        // Clamping vertical position
+        if location.y < 100 {
+            location.y = 100
+        } else if location.y > 720 {
+            location.y = 720
+        }
     }
 }
