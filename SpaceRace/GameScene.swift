@@ -18,7 +18,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         }
     }
     
-    let possibleEnemies = ["ball", "hammer", "tv"]
+    let possibleEnemies = ["chair", "tv", "hammer", "ball", "shoe", "octopus", "astronaut", "tower", "redeemer", "samba", "witch"]
     var isGameOver = false
     var gameTimer: Timer?
     
@@ -31,7 +31,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addChild(starfield)
         starfield.zPosition = -1
         
-        player = SKSpriteNode(imageNamed: "player")
+        player = SKSpriteNode(imageNamed: "rocket")
         player.position = CGPoint(x: 100, y: 410)
         player.physicsBody = SKPhysicsBody(texture: player.texture!, size: player.size) // Create a physics body based on the texture and size.
         player.physicsBody?.contactTestBitMask = 1
@@ -47,7 +47,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         physicsWorld.gravity = CGVector(dx: 0, dy: 0)
         physicsWorld.contactDelegate = self
         
-        gameTimer = Timer.scheduledTimer(timeInterval: 0.35, target: self, selector: #selector(createEnemy), userInfo: nil, repeats: true)
+        gameTimer = Timer.scheduledTimer(timeInterval: 0.8, target: self, selector: #selector(createEnemy), userInfo: nil, repeats: true)
         
     }
     
