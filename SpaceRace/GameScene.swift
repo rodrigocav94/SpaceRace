@@ -34,24 +34,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         addChild(starfield)
         starfield.zPosition = -1
         
-        player = SKSpriteNode(imageNamed: "rocket")
-        player.position = CGPoint(x: 200, y: 410)
-        player.physicsBody = SKPhysicsBody(texture: player.texture!, size: player.size) // Create a physics body based on the texture and size.
-        player.physicsBody?.contactTestBitMask = 1
-        addChild(player)
-        
         scoreLabel = SKLabelNode(fontNamed: "Chalkduster")
         scoreLabel.position = CGPoint(x: 16, y: 16)
         scoreLabel.horizontalAlignmentMode = .left
         addChild(scoreLabel)
-        
-        score = 0
-        
+
         physicsWorld.gravity = CGVector(dx: 0, dy: 0)
         physicsWorld.contactDelegate = self
         
-        startTimer()
-        
+        startGame(at: CGPoint(x: 200, y: 410))
     }
     
     override func update(_ currentTime: TimeInterval) {
@@ -91,8 +82,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else { return }
         var location = touch.location(in: self)
-        
         clampLocation(location: &location)
+        if isGameOver {
+            startGame(at: location)
+            return
+        }
         
         isPlayerRerouting = true
         let moveToLocation = SKAction.move(to: location, duration: 0.3)
@@ -138,5 +132,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func startTimer() {
         gameTimer?.invalidate()
         gameTimer = Timer.scheduledTimer(timeInterval: enemyCreationDelay, target: self, selector: #selector(createEnemy), userInfo: nil, repeats: true)
+    }
+    
+    func startGame(at location: CGPoint) {
+        isGameOver = false
+        
+        player = SKSpriteNode(imageNamed: "rocket")
+        player.position = location
+        player.physicsBody = SKPhysicsBody(texture: player.texture!, size: player.size) // Create a physics body based on the texture and size.
+        player.physicsBody?.contactTestBitMask = 1
+        addChild(player)
+        
+        score = 0
+        
+        enemyCreationDelay = 1
+        startTimer()
     }
 }
