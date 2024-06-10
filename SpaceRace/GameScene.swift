@@ -14,6 +14,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var amountOfEnemies = 0
     var enemyCreationDelay: Double = 1
     var gameOver: SKSpriteNode?
+    var title: SKSpriteNode!
     
     var scoreLabel: SKLabelNode!
     var score = 0 {
@@ -42,6 +43,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         starfield.advanceSimulationTime(10)
         addChild(starfield)
         starfield.zPosition = -1
+        
+        title = SKSpriteNode(imageNamed: "title")
+        title.position = CGPoint(x: 590, y: 690)
+        title.alpha = 0.9
+        addChild(title)
+        title.zPosition = -1
         
         scoreLabel = SKLabelNode(fontNamed: "Chalkduster")
         scoreLabel.position = CGPoint(x: 16, y: 16)
@@ -167,10 +174,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             } else if gameOver?.parent == nil  {
                 addChild(gameOver!)
             }
+            title.run(SKAction.fadeAlpha(to: 0, duration: 0.5))
         }
     }
     
     func hideGameOver() {
         gameOver?.removeFromParent()
+        title.run(SKAction.fadeAlpha(to: 0.9, duration: 0.5))
     }
 }
